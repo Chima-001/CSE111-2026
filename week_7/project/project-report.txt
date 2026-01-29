@@ -1,0 +1,55 @@
+Student Project Report
+
+Do the following:
+
+1. In the table below, list the dates, amount of time spent, and
+description of the work that you did on your project. Follow the example
+that is in the first row of the table below. Include the time you spent
+doing any of the following:
+    a. discussing your project with your teacher, tutor, or fellow students
+    b. researching by reading articles and watching applicable videos
+    c. designing your project by drawing diagrams and other applicable documents
+    d. writing experimental code
+    d. writing code for your project
+    e. writing test functions
+    f. debugging your code
+    g. any other activity that helped you complete your project
+
+=============Example====================
+            Time Spent
+   Date       (hours)   Description of Work
+----------  ----------  -------------------------
+2021-12-03      2.5     Wrote two program functions and two test functions
+2021-12-03      .5      Watched video on 
+=============Example====================
+
+
+=================================
+
+            Time Spent
+   Date       (hours)   Description of Work
+----------  ----------  -------------------------
+2026-01-29      3       I made researches, installed cryptography module and initialized the Password and PasswordVault classes
+
+2026-02-02      1       I wrote the add_password method and watched a video on how to use the cryptography module for encryption
+
+2026-02-03      2       I wrote the save_to_file and load_from_file methods and wrote the gen_password method which calls the generate_password 
+                        funtion from the passwords.py module to automatically generate passwords for the user
+
+2026-02-05      4       I wrote the delete_password, get_password, list_services and edit_password methods (functions). I also wrote the test_fuctions
+                        in the test_passwords_manager.py program to test the methods (functions) I have written already
+
+2026-02-06      3       I wrote the _encrypt and _decrypt methods using the cryptography module, to encrypt the passwords before they are written/saved 
+                        to the passwords.txt file and decrypt the passwords each time they are being loaded from the file, and the _setup_encryption method 
+                        (setting this up took me a while to figure out). I wrote the test_fuctions for the methods I added today. I also added try and except
+                        checks for the necessary methods.
+
+2026-02-07      4       I wrote the main function and called every method to their respective uses. I spent most of the time cross-checking and fixing errors
+                        in each method/function.
+=================================
+
+
+
+2. In Canvas, submit this completed text file, your Python program, your
+Python test file, and any project data files such as .txt and .csv files and
+link to video walkthrough if needed.

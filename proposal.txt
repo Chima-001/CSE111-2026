@@ -1,0 +1,56 @@
+CSE 111 Proposal for a Student Chosen Program
+
+    (This is a proposal. All proposals are written with our best
+    knowledge at the beginning of a project. As we progress from the
+    beginning to the end of a project, we gain more knowledge, and we
+    change some of our proposed ideas. This is part of completing any
+    project and is fine.  However, we still must write a proposal so
+    that our teachers or supervisors know what we intend to do. Please
+    answer each of the following questions to the best of your
+    knowledge.)
+
+1. What is the title of your program?
+
+    The title of my program is passwords_manager.py
+
+2. What real-world problem will your program address or help to solve?
+
+    My program will solve password chaos (multiple logins, forgotten passwords),
+    and will teach good habits like password generation and storage.
+
+3. What will you learn from developing this program?
+
+    I will learn encryption and improve my skills on file handling.
+    Also, I will improve my skills on Object-Oriented-Programming (OOP),
+    a concept I learnt from my personal Python programming studies and 
+    practices during the last vacation, and which I have been eager to use in 
+    real world problem solving projects.
+
+4. What Python modules will your program use?
+
+    (Some examples are: csv, datetime, functools, matplotlib, math,
+    pandas, pytest, random, requests, and tkinter.)
+
+    My program will use cryptography module for encryption, os (for 
+    file, key managemnet), and the generate_password function from passwords.py program
+
+5. List the names of functions you will need?
+
+    (Remember that the most reusable functions don't get user input and
+    don't print results but instead have parameters and return a result.
+    Functions that get user input and print results are important and do
+    useful work but are not easily reusable.)
+
+    (Remember also that it's hard to test functions that get user input
+    and print results. It's easy to test functions that don't get user
+    input and don't print results but instead have parameters and return
+    a result. Therefore, you should write most of your program functions
+    to have parameters and return a result.)
+
+    I will need functions like save_to_file (creates and saves the password to a file), 
+    load_from_file (loads the passwords file when the user runs the program), 
+    add_password function, delete_password function, etc.
+
+6. List the names of the test functions you will write.
+    Some of the test functions I will write are, test_encrypt_decrypt, test_add_password
+    test_save_to_file, test_load_from_file, test_delete_password
