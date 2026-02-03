@@ -1,4 +1,8 @@
+# Please note that running this file will create and leave a password in the passwords.txt file
+# and will remain there unless manually deleted.
+
 from passwords_manager import Password, PasswordVault
+from unittest.mock import patch
 import pytest
 import os
 
@@ -14,6 +18,15 @@ def vault():
     
     if os.path.exists('secret.key'):
         os.remove('secret.key')
+
+@pytest.fixture
+def cleanup_master():
+    if os.path.exists('master.txt'):
+        os.remove('master.txt')
+
+    yield
+    if os.path.exists('master.txt'):
+        os.remove('master.txt')
     
 # Test Password class
 def test_password_init():
@@ -147,15 +160,16 @@ def test_load_from_file(vault):
 def test_delete_password(vault):
     vault.password_list.append(Password('Facebook', 'Chima', 'BYU-CSE111'))
     vault.password_list.append(Password('Whatsapp', 'Nnaji', 'pwd-mngr!7t4'))
-    vault.password_list.append(Password('Twitter', 'Track', 'blake1999'))
+    vault.password_list.append(Password('Pinterest', 'Track', 'blake1999'))
     
     assert vault.delete_password('Facebook') == True
     assert vault.delete_password('WHAtsApp') == True  # Test case insensitivity
+    assert vault.delete_password('Pinterest') == True
 
     # Verify deleted password no longer in list
     assert vault.get_password('Facebook') is None
     assert vault.get_password('Whatsapp') is None
-    assert vault.get_password('Twitter') == 'blake1999'  # Twitter should still remain
+    assert vault.get_password('Pinterest') is None
 
 def test_encrypt(vault):
     encrypted = vault._encrypt('test')
@@ -179,5 +193,34 @@ def test_decrypt(vault):
 
     encrypted = vault._encrypt('$HEX[3168653a]')
     assert vault._decrypt(encrypted) == '$HEX[3168653a]'
+
+def test_get_master_password(cleanup_master):
+    result = PasswordVault.get_master_password()
+    assert result is None
+
+    temp_vault = PasswordVault('')
+    encrypted = temp_vault._encrypt('test_password')
+    with open('master.txt', 'w') as file:
+        file.write(encrypted)
+    result = PasswordVault.get_master_password()
+    assert result == 'test_password'
+
+    encrypted = temp_vault._encrypt('password123')
+    with open('master.txt', 'w') as file:
+        file.write(encrypted)
+    result = PasswordVault.get_master_password()
+    assert result == 'password123'
+
+def test_create_master_password(cleanup_master):
+    with patch('builtins.input', side_effect= ['mypassword', 'mypassword']):
+        result = PasswordVault.create_master_password()
+    assert result == 'mypassword'
+    assert os.path.exists('master.txt')
+
+    os.remove('master.txt')
+    with patch('builtins.input', side_effect= ['a', 'b']):
+        result = PasswordVault.create_master_password()
+    assert result is None
+
 
 pytest.main(["-v", "--tb=line", "-rN", __file__])

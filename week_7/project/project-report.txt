@@ -44,8 +44,10 @@ doing any of the following:
                         (setting this up took me a while to figure out). I wrote the test_fuctions for the methods I added today. I also added try and except
                         checks for the necessary methods.
 
-2026-02-07      4       I wrote the main function and called every method to their respective uses. I spent most of the time cross-checking and fixing errors
-                        in each method/function.
+2026-02-07      5       I wrote the get_master_password and create_master_password functions to prompt first time users to create a master password for the 
+                        security of the passwords.txt file and wrote the test functions for each. I also wrote the main function and called every method to their
+                        respective uses.
+
 =================================
 
 

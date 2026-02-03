@@ -109,6 +109,9 @@ class PasswordVault:
                     service = new_line[0]
                     username = new_line[1]
                     password = self._decrypt(new_line[2])
+                    if password is None:
+                        print(f"Warning: Failed to decrypt password for service '{service}'. Skipping entry.")
+                        continue
                     new_password = Password(service, username, password)
                     self.password_list.append(new_password)
             return True
@@ -149,123 +152,222 @@ class PasswordVault:
                 return True
         return False
 
+    def get_master_password():
+        master_file = 'master.txt'
+        if os.path.exists(master_file):
+            try:
+                temp_vault = PasswordVault('')
+
+                with open(master_file, 'r') as file:
+                    encrypted_password = file.read().strip()
+                    decrypted_password = temp_vault._decrypt(encrypted_password)
+                return decrypted_password
+                
+            except Exception:
+                return None
+            
+        else:
+            return None
+        
+    def create_master_password():
+        master_file = 'master.txt'
+
+        password1 = input('Enter master password: ')
+        if not password1:
+            return None
+        password2 = input('Confirm master password: ')
+
+        if password1 == password2:
+            try:
+                temp_vault = PasswordVault('')
+                encrypted_password = temp_vault._encrypt(password1)
+                if encrypted_password is None:
+                    return None
+                
+                with open(master_file, 'w') as file:
+                    file.write(encrypted_password)
+                return password1
+            
+            except Exception:
+                return None
+        else:
+            return None
+        
+
 def main():
     print('\n===== PASSWORD MANAGER ======')
-    attempts = 0
 
+    correct_password = PasswordVault.get_master_password()
+    if correct_password is None:
+        print('\n-- FIRST TIME SETUP --')
+        print('Create your password')
+
+        while True:
+            correct_password = PasswordVault.create_master_password()
+            if correct_password:
+                print('✔ Password created!\n')
+                break
+            else:
+                print('❗ Passwords do not match or empty. Try again.')
+
+    attempts = 0
+    
     while True:
         master = input('Enter master password or \'0\' to quit: ')
-        vault = PasswordVault('master')
 
         if master == '0':
             break
 
-        if vault.cipher is None:
-            print('⚠ Error: Failed to initialize encryption.')
-            continue
-
-        elif master != vault.master_password:
+        if master != correct_password:
             attempts += 1
             if attempts >= 3:
                 print('❗ Too many failed attempts. Exiting for security.')
                 break
             print(f'Wrong password. Try again. {3-attempts} attempts remaining.')
             continue
+        
+        vault = PasswordVault(master)
 
-        else:
-            vault.load_from_file(filename='passwords.txt')
+        if vault.cipher is None:
+            print('⚠ Error: Failed to initialize encryption.')
+            continue
 
-            while True:
-                print('\n-- MENU OPTIONS --\n')
-                print(f'Passwords stored: {len(vault.password_list)}')
-                print('1. Add Password\n2. Edit Password\n3. Get Password\n4. List Services\n5. View All Passwords\n6. Delete Password\n7. Exit')
+        attempts = 0
 
-                try:
-                    user_choice = int(input('Enter an option (1-7): '))
+        vault.load_from_file(filename='passwords.txt')
 
-                except ValueError:
-                    print('Invalid input. Enter numbers (1-7)')
-                    continue
+        while True:
+            print('\n-- MENU OPTIONS --\n')
+            print(f'Passwords stored: {len(vault.password_list)}')
+            print('1. Add Password\n2. Edit Password\n3. Get Password\n4. List Services\n5. View All Passwords\n6. Delete Password\n7. Exit')
 
-                if user_choice == 1:
+            try:
+                user_choice = int(input('Enter an option (1-7): '))
+
+            except ValueError:
+                print('Invalid input. Enter numbers (1-7)')
+                continue
+
+            if user_choice == 1:
+                while True:
                     while True:
-                        while True:
-                            service = input('Enter password service: ')
-                            if not service:
-                                print('❗ Service name cannot be empty.')
-                            else:
-                                break
+                        service = input('Enter password service: ')
+                        if not service:
+                            print('❗ Service name cannot be empty.')
+                        else:
+                            break
 
-                        while True: 
-                            username = input('Enter username: ')
-                            if not username:
-                                print('❗ Username cannot be empty.')
-                            else:
-                                break
+                    while True: 
+                        username = input('Enter username: ')
+                        if not username:
+                            print('❗ Username cannot be empty.')
+                        else:
+                            break
 
-                        while True:
-                            password = input('Enter password or \'g\' to generate password: ')
-                            if password.lower() == 'g'.lower():
-                                password = vault.gen_password()
-                                break
+                    while True:
+                        password = input('Enter password or \'g\' to generate password: ')
+                        if password.lower() == 'g'.lower():
+                            password = vault.gen_password()
+                            break
 
-                            elif not password:
-                                print('❗ Password cannot be empty.')
-
-                            else:
-                                break
-
-                        if not vault.add_password(service, username, password):
-                            print(f'Service \'{service}\' already exists, use another password service.')
-                            continue
-
-                        print(f'Password {password} has been successfully saved.')
-                        break
-                            
-                    continue
-
-                elif user_choice == 2:
-                    if not vault.password_list:
-                        print('No password stored')
-
-                    else:
-                        while True:
-                            service  = input('Enter password service to edit: ')
-                            if not service:
-                                print('❗ Service name cannot be empty.')
-                            
-                            else:
-                                current_password = vault.get_password(service)
-                                break
-
-                        if current_password:
-                            print(f'Current password for {service.capitalize()}: {current_password}')
-
-                            while True:
-                                new_password = input('Enter new password or \'g\' to generate: ')
-                                if not new_password:
-                                    print('❗ Password cannot be empty.')
-                                
-                                else:
-                                    break
-
-                            if new_password.lower() == 'g':
-                                new_password = vault.gen_password()
-                                print(f'Generated password: {new_password}')
-
-                            if vault.edit_password(service, new_password):
-                                print(f'Password for {service} sucessfully updated to {new_password}')
+                        elif not password:
+                            print('❗ Password cannot be empty.')
 
                         else:
-                            print(f'Password service \'{service}\' not found.')
+                            break
 
-                    continue
-
-                elif user_choice == 3:
-                    if not vault.password_list:
-                        print('No password stored. Add a password first.')
+                    if not vault.add_password(service, username, password):
+                        print(f'Service \'{service}\' already exists, use another password service.')
                         continue
 
+                    print(f'✔ Password {password} has been successfully saved.')
+                    break
+                        
+                continue
+
+            elif user_choice == 2:
+                if not vault.password_list:
+                    print('No password stored')
+
+                else:
+                    while True:
+                        service  = input('Enter password service to edit: ')
+                        if not service:
+                            print('❗ Service name cannot be empty.')
+                        
+                        else:
+                            current_password = vault.get_password(service)
+                            break
+
+                    if current_password:
+                        print(f'Current password for {service.capitalize()}: {current_password}')
+
+                        while True:
+                            new_password = input('Enter new password or \'g\' to generate: ')
+                            if not new_password:
+                                print('❗ Password cannot be empty.')
+                            
+                            else:
+                                break
+
+                        if new_password.lower() == 'g':
+                            new_password = vault.gen_password()
+                            print(f'Generated password: {new_password}')
+
+                        if vault.edit_password(service, new_password):
+                            print(f'✔ Password for {service} sucessfully updated to {new_password}')
+
+                    else:
+                        print(f'Password service \'{service}\' not found.')
+
+                continue
+
+            elif user_choice == 3:
+                if not vault.password_list:
+                    print('No password stored. Add a password first.')
+                    continue
+
+                while True:
+                    service = input('Enter password service: ')
+                    if not service:
+                        print('❗ Service name cannot be empty.')
+
+                    else:
+                        break
+
+                password = vault.get_password(service)
+                if password:
+                    print(f'Password for {service}: {password}')
+                else:
+                    print(f'Password service \'{service}\' not found.')
+                continue
+
+            elif user_choice == 4:
+                if not vault.password_list:
+                    print('No password stored. Add a password first.')
+
+                else:
+                    print('\nStored services:')
+                    for service in vault.list_services():
+                        print(service)
+
+                continue
+
+            elif user_choice == 5:
+                if not vault.password_list:
+                    print('No passwords available. Add a password first.')
+
+                for entry in vault.password_list:
+                    print(entry)
+
+                continue
+
+                
+            elif user_choice == 6:
+                if not vault.password_list:
+                    print(f'No password stored.')
+
+                else:
                     while True:
                         service = input('Enter password service: ')
                         if not service:
@@ -274,70 +376,33 @@ def main():
                         else:
                             break
 
-                    print(vault.get_password(service))
-                    continue
-
-                elif user_choice == 4:
-                    if not vault.password_list:
-                        print('No password stored. Add a password first.')
-
-                    else:
-                        print('\nStored services:')
-                        for service in vault.list_services():
-                            print(service)
-
-                    continue
-
-                elif user_choice == 5:
-                    if not vault.password_list:
-                        print('No passwords available. Add a password first.')
-
-                    for entry in vault.password_list:
-                        print(entry)
-
-                    continue
-
-                    
-                elif user_choice == 6:
-                    if not vault.password_list:
-                        print(f'No password stored.')
-
-                    else:
-                        while True:
-                            service = input('Enter password service: ')
-                            if not service:
-                                print('❗ Service name cannot be empty.')
-                            
-                            else:
-                                break
-
-                        while True:
-                            confirm = input(f'Are you sure you want to delete \'{service}\'? (y/n): ')
-                            if confirm.lower() == 'y':
-                                if vault.delete_password(service):
-                                   print('Password successfully deleted.')
-                                   break
-
-                                else:
-                                    print(f'Password service \'{service}\' not found.')
-                                    break
-
-                            elif confirm.lower() == 'n':
-                                print('Delete cancelled')
+                    while True:
+                        confirm = input(f'Are you sure you want to delete \'{service}\'? (y/n): ')
+                        if confirm.lower() == 'y':
+                            if vault.delete_password(service):
+                                print('Password successfully deleted.')
                                 break
 
                             else:
-                                print('⚠ Invalid! Enter a valid input (y/n)')
+                                print(f'Password service \'{service}\' not found.')
+                                break
 
-                            continue
+                        elif confirm.lower() == 'n':
+                            print('Delete cancelled')
+                            break
 
-                elif user_choice == 7:
-                    print('Exiting...')
-                    return
-                
-                else:
-                    print('⚠ Invalid input. Enter numbers (1-7): ')
-                    continue
+                        else:
+                            print('⚠ Invalid! Enter a valid input (y/n)')
+
+                        continue
+
+            elif user_choice == 7:
+                print('Exiting...')
+                return
+            
+            else:
+                print('⚠ Invalid input. Enter numbers (1-7): ')
+                continue
 
 if __name__ == '__main__':
     main()
