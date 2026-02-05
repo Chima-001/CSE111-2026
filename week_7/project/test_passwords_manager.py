@@ -1,5 +1,6 @@
-# Please note that running this file will create and leave a password in the passwords.txt file
-# and will remain there unless manually deleted.
+# Running this test program removes/deletes the master.txt and the secret.key files initially created
+# in the passwords_manager.py program. User will have to create a new master password in the 
+# passwords_manager.py program after running this program.
 
 from passwords_manager import Password, PasswordVault
 from unittest.mock import patch
@@ -130,8 +131,6 @@ def test_gen_password(vault):
     assert len(password) == 16 
 
 def test_save_to_file(vault):
-    #assert vault.save_to_file('test_passwords.txt') is False  # Checks empty vault saving returns False
-
     vault.password_list.append(Password('whatsapp', 'Nnaji', 'pwd-mngr!7t4'))
     vault.password_list.append(Password('Outlook', 'Miles', '$HEX[66617368696f6e310d]'))
     vault.password_list.append(Password('Facebook', 'Chima', 'BYU-CSE111'))
@@ -155,7 +154,6 @@ def test_load_from_file(vault):
     new_vault = PasswordVault('test_master')
     assert new_vault.load_from_file('test_passwords.txt') == True
     assert len(new_vault.password_list) == 1
-
 
 def test_delete_password(vault):
     vault.password_list.append(Password('Facebook', 'Chima', 'BYU-CSE111'))
@@ -221,6 +219,8 @@ def test_create_master_password(cleanup_master):
     with patch('builtins.input', side_effect= ['a', 'b']):
         result = PasswordVault.create_master_password()
     assert result is None
+
+    os.remove('secret.key')
 
 
 pytest.main(["-v", "--tb=line", "-rN", __file__])

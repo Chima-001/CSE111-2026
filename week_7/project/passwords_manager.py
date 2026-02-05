@@ -109,9 +109,11 @@ class PasswordVault:
                     service = new_line[0]
                     username = new_line[1]
                     password = self._decrypt(new_line[2])
+
                     if password is None:
                         print(f"Warning: Failed to decrypt password for service '{service}'. Skipping entry.")
                         continue
+                    
                     new_password = Password(service, username, password)
                     self.password_list.append(new_password)
             return True
@@ -205,7 +207,8 @@ def main():
         while True:
             correct_password = PasswordVault.create_master_password()
             if correct_password:
-                print('✔ Password created!\n')
+                print('Password created!')
+                print('❕ WARNING! If you lose this password, you will not be able to access your passwords file, forever.\n')
                 break
             else:
                 print('❗ Passwords do not match or empty. Try again.')
@@ -280,7 +283,7 @@ def main():
                         print(f'Service \'{service}\' already exists, use another password service.')
                         continue
 
-                    print(f'✔ Password {password} has been successfully saved.')
+                    print(f'Password {password} has been successfully saved.')
                     break
                         
                 continue
@@ -315,7 +318,7 @@ def main():
                             print(f'Generated password: {new_password}')
 
                         if vault.edit_password(service, new_password):
-                            print(f'✔ Password for {service} sucessfully updated to {new_password}')
+                            print(f'Password for {service} sucessfully updated to {new_password}')
 
                     else:
                         print(f'Password service \'{service}\' not found.')
@@ -361,7 +364,6 @@ def main():
                     print(entry)
 
                 continue
-
                 
             elif user_choice == 6:
                 if not vault.password_list:
